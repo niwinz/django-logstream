@@ -8,6 +8,11 @@ from multiprocessing import Process
 
 import zmq
 import Queue
+import copy
+
+from Crypto.Cipher import Blowfish
+from Crypto.Hash import SHA
+
 
 class WorkerProcessor(object):
     def __init__(self):
@@ -18,13 +23,35 @@ class WorkerProcessor(object):
         
         self.queue = queue
         self.storage = storage.Storage()
+        self.cipher = Blowfish.new(settings.SECRET_KEY)
 
-        counter = 0
         while True:
             qobj = self.queue.get(block=True)
-            if self._analyze_object(qobj):
+            if not self._analyze_object(qobj):
+                continue
+
+            is_encrypted = bool(qobj.pop('encrypt', False))
+            valid, qobj = self._decrypt(qobj)
+
+            if valid:
                 self._process_object(qobj)
 
+    def _decrypt(self, obj):
+        nobj = copy.deepcopy(obj)
+        valid = True
+
+        for key, value in obj.iteritems():
+            if not isinstance(value, (str, unicode)):
+                continue
+            if value.endswith("_sha"):
+                continue
+            nobj[key] = self.cipher.decrypt(value)
+            if SHA.new(nobj[key]).hexdigest() != \
+                                    nobj[key + '_sha']:
+                valid = False
+            del nobj[key + '_sha']
+        return valid, nobj
+    
     def _analyze_object(self, obj):
         if not isinstance(obj, dict):
             return False
@@ -71,6 +98,7 @@ class WorkerReceiver(object):
     def __del__(self):
         self.worker.terminate()
         self.socket.close()
+
 
 class Backend(object):
     __metaclass__ = Singleton
