@@ -18,7 +18,7 @@ class Storage(object):
     callback = lambda x,y: x
 
     def _get_logpath(self):
-        return getattr(settings, 'RECEIVER_LOG_STORAGE_PATH')
+        return getattr(settings, 'LOGSTREAM_STORAGE_PATH')
 
     def _get_interval(self):
         return self.interval_unit
