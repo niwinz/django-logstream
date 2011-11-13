@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011 Andrei Antoukh <niwi@niwi.be>
 
-import re, os, codecs, time, logging
+import re, os, codecs, time, logging, io
 from stat import ST_DEV, ST_INO, ST_MTIME
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.encoding import force_unicode
 
 log = logging.getLogger('logserverd')
 
@@ -29,6 +30,7 @@ class Storage(object):
         self.interval = self._get_interval() * interval
         self.suffix = "%Y-%m-%d_%H-%M-%S"
         self.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}$")
+        self._initial_check()
 
     def _initial_check(self):
         logpath = self._get_logpath()
@@ -43,7 +45,7 @@ class Storage(object):
         if alias not in self.alias_list:
             logpath = self._get_logpath()
             self.alias_list[alias] = {
-                'path': os.path.join(logpath, service),
+                'path': os.path.join(logpath, alias),
             }
         
             if not os.path.exists(self.alias_list[alias]['path']):
@@ -86,19 +88,19 @@ class Storage(object):
             return True
         return False
 
-    def _open(self, service):
+    def _open(self, alias):
         filepath = self.alias_list[alias]['filepath']
-        if self.encoding is None:
-            stream = open(filepath, self.mode)
-        else:
-            stream = codecs.open(filepath, self.mode, self.encoding)
-        return stream
+        #if self.encoding is None:
+        #    stream = open(filepath, self.mode)
+        #else:
+        #    stream = codecs.open(filepath, self.mode, self.encoding)
+        return io.open(filepath, 'a', encoding='utf-8')
 
     def _doRollover(self, alias):
         """
-        Rollover logfile for service.
+        Rollover logfile for alias.
 
-        :param str service: service name
+        :param str alias: alias name
         :return: Nothink
         :rtype: None
         """
@@ -126,7 +128,7 @@ class Storage(object):
         while newRolloverAt <= currentTime:
             newRolloverAt = newRolloverAt + self.interval
 
-        self.services[service]['rolloverAt'] = newRolloverAt
+        self.alias_list[alias]['rolloverAt'] = newRolloverAt
 
             
     def insert(self, alias, record):
@@ -134,4 +136,4 @@ class Storage(object):
 
         self._inter_check(alias)
         if self.enabled:
-            self.alias_list[alias]['stream'].write(record + '\n')
+            self.alias_list[alias]['stream'].write(force_unicode(record + '\n'))

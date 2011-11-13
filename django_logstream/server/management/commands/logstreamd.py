@@ -3,9 +3,13 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 
-import pyzmq
-
+from django_logstream.server import get_backend
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        pass
+        try:
+            bk = get_backend()
+            bk.wait()
+        except KeyboardInterrupt:
+            print "Exiting..."
+            bk.terminate()
