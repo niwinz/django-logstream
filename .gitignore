@@ -1,2 +1,7 @@
 *.pyc
-doc/build*
+.*swp
+doc/build
+dist
+django_logstream.egg-info*
+versiontools*
+build*
