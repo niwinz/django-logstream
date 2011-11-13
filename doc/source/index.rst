@@ -49,7 +49,7 @@ As the first and only step, configure your logging in django settings.py.
 
 This is an posible example:
 
-.. code-block:: 
+.. code-block:: python
 
     LOGGING = {
         [...]
