@@ -9,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 log = logging.getLogger('logserverd')
 
-class BaseStorage(object):
+class Storage(object):
     #interval_unit = 60 * 60 * 24
     interval_unit = 30
     enabled = True
