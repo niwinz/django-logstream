@@ -31,7 +31,7 @@ class ZeroMQHandler(StreamHandler):
     def _encrypt_str(self, data):
         res = len(data) % 8
         if res != 0:
-            data = data + " " * (8-res)
+            data = data + "\0" * (8-res)
         return self.cipher.encrypt(data)
 
     def _encrypt(self, obj):

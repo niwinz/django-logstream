@@ -29,12 +29,14 @@ class WorkerProcessor(object):
             qobj = self.queue.get(block=True)
             if not self._analyze_object(qobj):
                 continue
-
+            
             is_encrypted = bool(qobj.pop('encrypt', False))
-            valid, qobj = self._decrypt(qobj)
+            if is_encrypted:
+                valid, qobj = self._decrypt(qobj)
+                if not valid:
+                    continue
 
-            if valid:
-                self._process_object(qobj)
+            self._process_object(qobj)
 
     def _decrypt(self, obj):
         nobj = copy.deepcopy(obj)
@@ -43,9 +45,9 @@ class WorkerProcessor(object):
         for key, value in obj.iteritems():
             if not isinstance(value, (str, unicode)):
                 continue
-            if value.endswith("_sha"):
+            if key.endswith("_sha"):
                 continue
-            nobj[key] = self.cipher.decrypt(value)
+            nobj[key] = self.cipher.decrypt(value).strip("\0")
             if SHA.new(nobj[key]).hexdigest() != \
                                     nobj[key + '_sha']:
                 valid = False
