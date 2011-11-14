@@ -20,9 +20,14 @@ class WorkerProcessor(object):
 
     def __call__(self, queue):
         print "Running WorkerProcessor thread..."
-        
+
+        self.logrotate_interval = int(getattr(settings,
+            'LOGSTREAM_LOGROTATE_INTERVAL', 60))
+        self.secure_mode = bool(getattr(settings,
+            'LOGSTREAM_SECURE_MODE', False))
+
         self.queue = queue
-        self.storage = storage.Storage()
+        self.storage = storage.Storage(interval=self.logrotate_interval)
         self.cipher = Blowfish.new(settings.SECRET_KEY)
 
         while True:
@@ -35,6 +40,11 @@ class WorkerProcessor(object):
                 valid, qobj = self._decrypt(qobj)
                 if not valid:
                     continue
+            
+            # skip all unencrtypted logs on secure
+            # mode is activated
+            if self.secure_mode:
+                continue
 
             self._process_object(qobj)
 
@@ -75,7 +85,7 @@ class WorkerReceiver(object):
     def _init(self):
         self.context = zmq.Context()
         self.bind_address = getattr(settings, 
-            'RECEIVER_BIND_ADDR', 'ipc:///tmp/logstream_receiver')
+            'LOGSTREAM_BIND_ADDR', 'ipc:///tmp/logstream_receiver')
 
         self.queue = Queue.Queue()
 
@@ -102,12 +112,21 @@ class WorkerReceiver(object):
         self.socket.close()
 
 
+from django.core.exceptions import ImproperlyConfigured
+
 class Backend(object):
     __metaclass__ = Singleton
 
     def __init__(self):
+        self._check_settings()
         self.start_receiver()
         self.start_rpc()
+
+    def _check_settings(self):
+        try:
+            getattr(settings, 'LOGSTREAM_STORAGE_PATH')
+        except:
+            raise ImproperlyConfigured('LOGSTREAM_STORAGE_PATH is not defined on yout settings')
 
     def start_receiver(self):
         self.process = Process(target=WorkerReceiver())

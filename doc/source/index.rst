@@ -44,6 +44,20 @@ Add ``django_logstream.server`` to ``INSTALLED_APPS`` list.
 And as the last step, we start the service with: ``python2 manage.py logstreamd``.
 
 
+Other configuration options:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+`LOGSTREAM_BIND_ADDR`
+    ZeroMQ path for bind address. Default: ``ipc:///tmp/logstream_receiver``
+
+`LOGSTREAM_SECURE_MODE`
+    Put logstream to secure mode. In this mode only accepts encrypted and
+    validated with sha1 hash messages. Default: False
+
+`LOGSTREAM_LOGROTATE_INTERVAL`
+    Set a interval in minutes for logrotate of logs. Default: 60
+
+
 How-To setup logstream client/s
 -------------------------------
 
@@ -60,6 +74,7 @@ This is an posible example:
                 'class': 'django_logstream.client.handlers.threaded.ZeroMQHandler',
                 'alias': 'myfirsttest',
                 'address': 'ipc:///tmp/logstream_receiver', # this is a default
+                'encrypt': True # default is False
             }
         },
         'loggers': {

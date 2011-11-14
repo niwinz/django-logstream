@@ -11,8 +11,8 @@ from django.utils.encoding import force_unicode
 log = logging.getLogger('logserverd')
 
 class Storage(object):
-    #interval_unit = 60 * 60 * 24
-    interval_unit = 30
+    interval_unit = 60
+    #interval_unit = 30
     enabled = True
     alias_list = {}
     callback = lambda x,y: x
@@ -23,7 +23,7 @@ class Storage(object):
     def _get_interval(self):
         return self.interval_unit
     
-    def __init__(self, interval=1, encoding=None, mode='a'):
+    def __init__(self, interval=60, encoding=None, mode='a'):
         log.info("Itializing storage...")
         self.encoding = encoding
         self.mode = mode
