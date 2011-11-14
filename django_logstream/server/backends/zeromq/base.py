@@ -36,6 +36,7 @@ class WorkerProcessor(object):
                 continue
             
             is_encrypted = bool(qobj.pop('encrypt', False))
+            valid = False
             if is_encrypted:
                 valid, qobj = self._decrypt(qobj)
                 if not valid:
@@ -43,7 +44,7 @@ class WorkerProcessor(object):
             
             # skip all unencrtypted logs on secure
             # mode is activated
-            if self.secure_mode:
+            if self.secure_mode and not valid: 
                 continue
 
             self._process_object(qobj)
