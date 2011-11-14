@@ -22,13 +22,15 @@ Features currently implemented:
 
 * alias for receive multiple streams.
 * logrotate by time interval.
+* encription and hash of all messages.
 
 
 Features implemented in future:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Encription and authentication for untrusted networks.
 * size logrotate option.
+* rabbitmq backend. (not prioritary)
+* redis backend. (not prioritary)
 
 
 How-To setup logstream daemon
@@ -50,9 +52,8 @@ As the first and only step, configure your logging in django settings.py.
 This is an posible example:
 
 .. code-block:: python
-
+    
     LOGGING = {
-        [...]
         'handlers': {
             'logstream': {
                 'level': 'DEBUG',
@@ -62,7 +63,6 @@ This is an posible example:
             }
         },
         'loggers': {
-            [...]
             'yourlogger': {
                 'level': 'DEBUG',
                 'handler': ['logstream'],
@@ -70,15 +70,3 @@ This is an posible example:
             }
         }
     }
-
-
-.. .. toctree::
-   :maxdepth: 2
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

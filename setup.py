@@ -33,7 +33,7 @@ setup(
     install_requires=[
         'distribute',
         'pyzmq>=2.1.10',
-        'pycrypto>=2.4.1'.
+        'pycrypto>=2.4.1',
     ],
     setup_requires = [
         'versiontools >= 1.8',
