@@ -9,13 +9,14 @@ django-logstream
 Introduction
 ------------
 
-The python and django logging really works very well, but we run into problems when 
-we have more than one instance (process) that has to write the logs into one file.
+Logging of python is great and the intagracion of django with python logging, it is also very good. 
+But sometimes we have to run multiple instances (processes) and want to save the logs without having problems 
+with files opened by multiple processes.
 
-``django-logstream`` solves this problem by maintaining a separate process that receives 
-logs from all other processes and properly managed logs.
+``django-logstream`` solves this problem. It runs as a service (separate process) that receives logs 
+of different instances, thus allowing multiple processes to the log stored in one file without any problem.
 
-Currently ``django-logstream`` uses ZeroMQ to communicate with the server request logs.
+Currently, ``django-logstream`` ZeroMQ used for interprocess communication and now with integrated encryption!
 
 Features currently implemented:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -31,6 +32,13 @@ Features implemented in future:
 * size logrotate option.
 * rabbitmq backend. (not prioritary)
 * redis backend. (not prioritary)
+
+How-To install
+--------------
+
+.. code-block:: shell
+
+    pip install django-logstream
 
 
 How-To setup logstream daemon
@@ -58,8 +66,8 @@ Other configuration options:
     Set a interval in minutes for logrotate of logs. Default: 60
 
 
-How-To setup logstream client/s
--------------------------------
+How-To setup logstream client
+-----------------------------
 
 As the first and only step, configure your logging in django settings.py.
 
