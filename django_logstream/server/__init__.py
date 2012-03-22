@@ -7,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 def get_backend(path=None):
     path = path or getattr(settings, 'LOGSTREAM_BACKEND',
        'django_logstream.server.backends.zeromq')
-
+    
     module = import_module(path + ".base")
     try:
         klass = getattr(module, 'Backend')

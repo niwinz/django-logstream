@@ -90,10 +90,6 @@ class Storage(object):
 
     def _open(self, alias):
         filepath = self.alias_list[alias]['filepath']
-        #if self.encoding is None:
-        #    stream = open(filepath, self.mode)
-        #else:
-        #    stream = codecs.open(filepath, self.mode, self.encoding)
         return io.open(filepath, 'a', encoding='utf-8')
 
     def _doRollover(self, alias):
@@ -129,7 +125,6 @@ class Storage(object):
             newRolloverAt = newRolloverAt + self.interval
 
         self.alias_list[alias]['rolloverAt'] = newRolloverAt
-
             
     def insert(self, alias, record):
         """Save logrecord on logfile."""
@@ -137,3 +132,4 @@ class Storage(object):
         self._inter_check(alias)
         if self.enabled:
             self.alias_list[alias]['stream'].write(force_unicode(record + '\n'))
+            self.alias_list[alias]['stream'].flush()

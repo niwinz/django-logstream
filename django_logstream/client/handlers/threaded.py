@@ -36,8 +36,8 @@ class ZeroMQHandler(StreamHandler):
 
     def _encrypt(self, obj):
         newobj = copy.deepcopy(obj)
-        newobj['alias'] = self._encrypt_str(obj['alias'])
-        newobj['record'] = self._encrypt_str(obj['record'])
+        newobj['alias'] = self._encrypt_str(obj['alias'].encode('utf-8'))
+        newobj['record'] = self._encrypt_str(obj['record'].encode('utf-8'))
         return newobj
 
     def _loop(self):
@@ -53,6 +53,9 @@ class ZeroMQHandler(StreamHandler):
         for key, value in obj.iteritems():
             if not isinstance(value, (str, unicode)):
                 continue
+
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
 
             nobj[key + "_sha"] = SHA.new(value).hexdigest()
         return nobj

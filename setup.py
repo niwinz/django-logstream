@@ -21,14 +21,7 @@ setup(
     author_email = 'niwi@niwi.be',
     maintainer = 'Andrei Antoukh',
     maintainer_email = 'niwi@niwi.be',
-    packages = [
-        'django_logstream',
-        'django_logstream.client',
-        'django_logstream.client.handlers',
-        'django_logstream.server',
-        'django_logstream.server.management',
-        'django_logstream.server.management.commands',
-    ],
+    packages = find_packages(),
     include_package_data = True,
     install_requires=[
         'distribute',
